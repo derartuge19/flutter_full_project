@@ -19,15 +19,15 @@ export class RolesGuard implements CanActivate {
       ROLES_KEY,
       context.getHandler(),
     );
-    console.log('Required Roles:', requiredRoles); // Debugging
+    console.log('Required Roles:', requiredRoles); 
 
     if (!requiredRoles) {
-      return true; // No roles required, proceed
+      return true; 
     }
 
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    console.log('User in RolesGuard:', user); // Debugging
+    console.log('User in RolesGuard:', user); 
 
     if (!user) {
       console.error('User object not found on request in RolesGuard');
@@ -46,12 +46,12 @@ export class RolesGuard implements CanActivate {
       if (typeof user.role === 'string') {
         return user.role === role; // Exact string match for single role
       } else if (Array.isArray(user.role)) {
-        return user.role.includes(role); // Check if the required role is in the array
+        return user.role.includes(role); 
       }
-      return false; // Role is neither string nor array, deny access
+      return false; 
     });
-    console.log('User Role:', user.role); // Debugging
-    console.log('Has Required Role:', hasRole); // Debugging
+    console.log('User Role:', user.role); 
+    console.log('Has Required Role:', hasRole); 
 
     if (!hasRole) {
       throw new ForbiddenException(
