@@ -118,7 +118,7 @@ class _MyIdeasPageState extends State<MyIdeasPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Idea deleted successfully')),
           );
-          _loadMyIdeas(); // Reload the list
+          _loadMyIdeas(); 
         }
       } else {
         if (mounted) {
@@ -185,7 +185,7 @@ class _MyIdeasPageState extends State<MyIdeasPage> {
             if (context.canPop()) {
               context.pop();
             } else {
-              context.go('/dashboard'); // Navigate to dashboard if no route to pop
+              context.go('/dashboard'); 
             }
           },
         ),
