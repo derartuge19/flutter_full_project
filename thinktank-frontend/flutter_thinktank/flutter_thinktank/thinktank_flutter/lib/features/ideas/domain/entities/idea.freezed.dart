@@ -12,7 +12,7 @@ Idea _$IdeaFromJson(Map<String, dynamic> json) {
   return _Idea.fromJson(json);
 }
 
-/// @nodoc
+
 mixin _$Idea {
   int get id => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
@@ -25,16 +25,15 @@ mixin _$Idea {
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
 
-  /// Serializes this Idea to a JSON map.
+ 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of Idea
-  /// with the given fields replaced by the non-null parameter values.
+  
   @JsonKey(includeFromJson: false, includeToJson: false)
   $IdeaCopyWith<Idea> get copyWith => throw _privateConstructorUsedError;
 }
 
-/// @nodoc
+
 abstract class $IdeaCopyWith<$Res> {
   factory $IdeaCopyWith(Idea value, $Res Function(Idea) then) =
       _$IdeaCopyWithImpl<$Res, Idea>;
@@ -81,49 +80,49 @@ class _$IdeaCopyWithImpl<$Res, $Val extends Idea>
     return _then(_value.copyWith(
       id: null == id
           ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
+          : id 
               as int,
       title: null == title
           ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
+          : title 
               as String,
       description: null == description
           ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
+          : description 
               as String,
       status: null == status
           ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
+          : status 
               as String,
       userId: null == userId
           ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
+          : userId 
               as int,
       userName: null == userName
           ? _value.userName
-          : userName // ignore: cast_nullable_to_non_nullable
+          : userName
               as String,
       feedback: freezed == feedback
           ? _value.feedback
-          : feedback // ignore: cast_nullable_to_non_nullable
+          : feedback 
               as String?,
       rating: freezed == rating
           ? _value.rating
-          : rating // ignore: cast_nullable_to_non_nullable
+          : rating 
               as int?,
       createdAt: freezed == createdAt
           ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
+          : createdAt
               as DateTime?,
       updatedAt: freezed == updatedAt
           ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
+          : updatedAt 
               as DateTime?,
     ) as $Val);
   }
 }
 
-/// @nodoc
+
 abstract class _$$IdeaImplCopyWith<$Res> implements $IdeaCopyWith<$Res> {
   factory _$$IdeaImplCopyWith(
           _$IdeaImpl value, $Res Function(_$IdeaImpl) then) =
@@ -143,15 +142,14 @@ abstract class _$$IdeaImplCopyWith<$Res> implements $IdeaCopyWith<$Res> {
       DateTime? updatedAt});
 }
 
-/// @nodoc
+
 class __$$IdeaImplCopyWithImpl<$Res>
     extends _$IdeaCopyWithImpl<$Res, _$IdeaImpl>
     implements _$$IdeaImplCopyWith<$Res> {
   __$$IdeaImplCopyWithImpl(_$IdeaImpl _value, $Res Function(_$IdeaImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of Idea
-  /// with the given fields replaced by the non-null parameter values.
+  
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -169,11 +167,11 @@ class __$$IdeaImplCopyWithImpl<$Res>
     return _then(_$IdeaImpl(
       id: null == id
           ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
+          : id 
               as int,
       title: null == title
           ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
+          : title 
               as String,
       description: null == description
           ? _value.description
