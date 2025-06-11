@@ -59,7 +59,6 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         final List<dynamic> allFeedback = feedbackResponse.data;
         print('Total feedback entries found: ${allFeedback.length}');
 
-        // The backend now returns only approved feedback, so we just process the ideas
         final List<Map<String, dynamic>> approvedIdeas = [];
         final Set<int> processedIdeaIds = {};
 
@@ -68,7 +67,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
           if (idea != null) {
             final ideaId = idea['id'];
             if (!processedIdeaIds.contains(ideaId)) {
-              // Create a new idea object with the feedback
+           
               final ideaWithFeedback = Map<String, dynamic>.from(idea);
               ideaWithFeedback['feedback'] = [feedback]; // Attach the feedback for display
               approvedIdeas.add(ideaWithFeedback);
@@ -202,11 +201,11 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     leading: IconButton(
     icon: const Icon(Icons.arrow_back, color: Colors.white),
     onPressed: () {
-    if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {Navigator.pop(context); // Close drawer
+    if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {Navigator.pop(context); 
     } else if (context.canPop()) {
       context.pop(); // Go back one step
     } else {
-      context.go('/'); // Navigate to landing page if no route to pop
+      context.go('/'); 
     }
     },
     ),
@@ -279,11 +278,9 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             color: const Color(0xFFFFA500),
             child: LayoutBuilder(
             builder: (context, constraints) {
-        // Always use 2 columns for mobile and tablet
-        // Use 3 columns only for desktop (> 900px)
+        
         final crossAxisCount = constraints.maxWidth < 900 ? 2 : 3;
 
-    // Calculate card width to ensure proper grid
     final cardWidth = (constraints.maxWidth - (crossAxisCount + 1) * 12) / crossAxisCount;
     // Calculate aspect ratio based on card width
     final aspectRatio = cardWidth / (cardWidth * 1.1); // Slightly shorter height for 2 columns
