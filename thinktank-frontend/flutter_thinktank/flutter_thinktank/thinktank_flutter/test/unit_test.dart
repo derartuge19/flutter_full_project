@@ -1,301 +1,523 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:dio/dio.dart';
-import 'package:mockito/mockito.dart';
-import 'package:mockito/annotations.dart';
-import 'package:thinktank_flutter/core/error/failures.dart';
-import 'package:thinktank_flutter/core/usecases/usecase.dart';
-import 'package:thinktank_flutter/features/auth/domain/repositories/auth_repository.dart';
-import 'package:thinktank_flutter/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:thinktank_flutter/features/auth/data/datasources/auth_remote_data_source.dart';
-import 'package:thinktank_flutter/features/ideas/data/models/idea.dart';
-import 'package:thinktank_flutter/features/feedback/data/models/feedback.dart';
-import 'package:dartz/dartz.dart';
-import 'package:thinktank_flutter/features/auth/domain/entities/user.dart';
+import 'package:thinktank_flutter/features/auth/data/repositories/auth_repository.dart';
 
-@GenerateMocks([AuthRemoteDataSource, SharedPreferences, AuthRepository])
-import 'unit_test.mocks.dart';
+class DashboardPage extends ConsumerStatefulWidget {
+  const DashboardPage({super.key});
 
-void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+  @override
+  ConsumerState<DashboardPage> createState() => _DashboardPageState();
+}
 
-  SharedPreferences.setMockInitialValues({});
+class _DashboardPageState extends ConsumerState<DashboardPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _isLoading = true;
+  String? _error;
+  List<dynamic> _ideas = [];
+  late AuthRepository _authRepository;
+  static const String baseUrl = 'http://10.0.2.2:3444';
 
-  late MockAuthRemoteDataSource mockRemoteDataSource;
-  late MockSharedPreferences mockPrefs;
-  late AuthRepository authRepository;
-  late MockAuthRepository mockAuthRepository;
+  @override
+  void initState() {
+    super.initState();
+    _initDashboardPage();
+  }
 
-  setUp(() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    
-    mockRemoteDataSource = MockAuthRemoteDataSource();
-    mockPrefs = MockSharedPreferences();
-    
-    authRepository = AuthRepositoryImpl(mockRemoteDataSource);
-    mockAuthRepository = MockAuthRepository();
-  });
+  Future<void> _initDashboardPage() async {
+    _authRepository = await AuthRepository.create();
+    _loadIdeas();
+  }
 
-  tearDown(() async {
-    // Clear SharedPreferences after each test
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-  });
-
-  group('Unit Tests', () {
-    test('A simple unit test', () {
-      // This is a placeholder for a unit test.
-      // Replace with actual unit tests for your app's logic.
-      expect(1 + 1, 2);
-    });
-  });
-
-  group('Failure', () {
-    test('ServerFailure should have correct message and code', () {
-      const tMessage = 'Server Error';
-      const tCode = '500';
-      const serverFailure = ServerFailure(message: tMessage, code: tCode);
-
-      expect(serverFailure.message, tMessage);
-      expect(serverFailure.code, tCode);
-      expect(serverFailure.props, [tMessage, tCode]);
+  Future<void> _loadIdeas() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
     });
 
-    test('NetworkFailure should have correct message and code', () {
-      const tMessage = 'No Internet Connection';
-      const networkFailure = NetworkFailure(message: tMessage);
+    try {
+      final token = await _authRepository.getToken();
+      if (token == null) {
+        context.go('/login');
+        return;
+      }
 
-      expect(networkFailure.message, tMessage);
-      expect(networkFailure.code, isNull);
-      expect(networkFailure.props, [tMessage, null]);
-    });
-  });
+      final dio = Dio();
+      dio.options.headers['Authorization'] = 'Bearer $token';
+      dio.options.validateStatus = (status) => status! < 500;
+      dio.options.connectTimeout = const Duration(seconds: 10);
+      dio.options.receiveTimeout = const Duration(seconds: 10);
 
-  group('NoParams', () {
-    test('should return true when comparing two NoParams instances', () {
-      const noParams1 = NoParams();
-      const noParams2 = NoParams();
+      // Get approved feedback from the new public endpoint
+      print('Fetching approved feedback from: ${baseUrl}/feedback/approved-ideas');
+      final feedbackResponse = await dio.get('$baseUrl/feedback/approved-ideas');
+      print('Feedback response status: ${feedbackResponse.statusCode}');
+      print('Feedback response data: ${feedbackResponse.data}');
 
-      expect(noParams1, equals(noParams2));
-    });
-  });
+      if (feedbackResponse.statusCode == 200) {
+        final List<dynamic> allFeedback = feedbackResponse.data;
+        print('Total feedback entries found: ${allFeedback.length}');
 
-  group('AuthRepository', () {
-    final testEmail = 'test@example.com';
-    final testPassword = 'password123';
-    final testName = 'Test User';
+        final List<Map<String, dynamic>> approvedIdeas = [];
+        final Set<int> processedIdeaIds = {};
 
-    test('login should return AuthResponse on success', () async {
-      // Arrange
-      final authResponse = AuthResponse(
-        token: 'test_token',
-        user: User(
-          id: 1,
-          email: testEmail,
-          name: testName,
-          role: 'user',
+        for (final feedback in allFeedback) {
+          final idea = feedback['idea'];
+          if (idea != null) {
+            final ideaId = idea['id'];
+            if (!processedIdeaIds.contains(ideaId)) {
+           
+              final ideaWithFeedback = Map<String, dynamic>.from(idea);
+              ideaWithFeedback['feedback'] = [feedback]; // Attach the feedback for display
+              approvedIdeas.add(ideaWithFeedback);
+              processedIdeaIds.add(ideaId);
+              print('Added approved idea to list: $ideaId');
+            }
+          }
+        }print('Total approved ideas found: ${approvedIdeas.length}');
+
+        setState(() {
+          _ideas = approvedIdeas;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _error = feedbackResponse.data?['message'] ?? 'Failed to load approved feedback. Status: ${feedbackResponse.statusCode}';
+          _isLoading = false;
+        });
+      }
+    } on DioException catch (e) {
+      print('DioException: ${e.message}');
+      print('Error type: ${e.type}');
+      print('Error response: ${e.response?.data}');
+
+      setState(() {
+        if (e.type == DioExceptionType.connectionTimeout) {
+          _error = 'Connection timed out. Please check your internet connection and try again.';
+        } else if (e.type == DioExceptionType.connectionError) {
+          _error = 'Could not connect to the server. Please make sure:\n'
+              '1. The backend server is running on port 3444\n'
+              '2. You are using the correct server URL\n'
+              '3. Your browser can access the server';
+        } else if (e.response?.statusCode == 403) {
+          _error = 'Access denied. You do not have permission to access this resource.';
+        } else {
+          _error = e.response?.data?['message'] ??
+              'Failed to load approved feedback: ${e.message}';
+        }
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Unexpected error: $e');
+      setState(() {
+        _error = 'An unexpected error occurred: $e';
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _openDrawer() {
+    _scaffoldKey.currentState?.openDrawer();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        key: _scaffoldKey,
+        backgroundColor: const Color(0xFF1A1A1A),
+    drawer: Drawer(
+    backgroundColor: const Color(0xFF1A1A1A),
+    child: Column(
+    children: [
+    const DrawerHeader(
+    decoration: BoxDecoration(
+    color: Color(0xFF1A1A1A),
+    ),
+    child: Center(
+    child: Text(
+    'Menu',
+    style: TextStyle(
+    color: Color(0xFFFFA500),
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+    ),
+    ),
+    ),
+    ),
+    _buildDrawerItem(
+    icon: Icons.home,
+    title: 'Dashboard',
+    onTap: () {
+    Navigator.pop(context);
+    context.go('/dashboard');
+    },
+    ),
+    _buildDrawerItem(
+    icon: Icons.person,
+    title: 'User Profile',
+    onTap: () {
+    Navigator.pop(context);
+    context.go('/profile');
+    },
+    ),
+    _buildDrawerItem(
+    icon: Icons.add,
+    title: 'Idea Submission',
+    onTap: () {
+    Navigator.pop(context);
+    context.go('/submit-idea');
+    },
+    ),
+    _buildDrawerItem(
+    icon: Icons.rate_review,
+    title: 'Feedback Pool',
+    onTap: () {
+    Navigator.pop(context);
+    context.go('/feedback-pool');
+    },
+    ),
+    _buildDrawerItem(
+    icon: Icons.logout,
+    title: 'Logout',
+    onTap: () {
+    Navigator.pop(context);
+    context.go('/');
+    },
+    ),
+    _buildDrawerItem(
+    icon: Icons.close,
+    title: 'Exit',
+    onTap: () {
+    Navigator.pop(context);
+    // TODO: Implement app exit
+    },
+    ),
+    ],
+    ),
+    ),
+    appBar: AppBar(
+    backgroundColor: const Color(0xFF1A1A1A),
+    leading: IconButton(
+    icon: const Icon(Icons.arrow_back, color: Colors.white),
+    onPressed: () {
+    if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {Navigator.pop(context); 
+    } else if (context.canPop()) {
+      context.pop(); // Go back one step
+    } else {
+      context.go('/'); 
+    }
+    },
+    ),
+      title: const Center(
+        child: Text(
+          'Approved Ideas',
+          style: TextStyle(
+            color: Color(0xFFFFA500),
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      );
-      when(mockAuthRepository.login(
-        email: testEmail,
-        password: testPassword,
-      )).thenAnswer((_) async => Right(authResponse));
-
-      // Act
-      final result = await mockAuthRepository.login(
-        email: testEmail,
-        password: testPassword,
-      );
-
-      // Assert
-      expect(result, Right(authResponse));
-      verify(mockAuthRepository.login(
-        email: testEmail,
-        password: testPassword,
-      )).called(1);
-    });
-
-    test('register should return AuthResponse on success', () async {
-      // Arrange
-      final authResponse = AuthResponse(
-        token: 'test_token',
-        user: User(
-          id: 1,
-          email: testEmail,
-          name: testName,
-          role: 'user',
+      ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: IconButton(
+            onPressed: _openDrawer,
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFA500).withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.menu,
+                color: Colors.white,
+              ),
+            ),
+          ),
         ),
-      );
-      when(mockAuthRepository.register(
-        email: testEmail,
-        password: testPassword,
-        name: testName,
-      )).thenAnswer((_) async => Right(authResponse));
+      ],
+    ),
+        body: _isLoading
+            ? const Center(
+          child: CircularProgressIndicator(
+            color: Color(0xFFFFA500),
+          ),
+        )
+            : _error != null
+            ? Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                _error!,
+                style: const TextStyle(color: Colors.red),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _loadIdeas,
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        )
+            : _ideas.isEmpty
+            ? const Center(
+          child: Text(
+            'No approved ideas yet',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+            ),
+          ),
+        )
+            : RefreshIndicator(
+            onRefresh: _loadIdeas,
+            color: const Color(0xFFFFA500),
+            child: LayoutBuilder(
+            builder: (context, constraints) {
+        
+        final crossAxisCount = constraints.maxWidth < 900 ? 2 : 3;
 
-      // Act
-      final result = await mockAuthRepository.register(
-        email: testEmail,
-        password: testPassword,
-        name: testName,
-      );
+    final cardWidth = (constraints.maxWidth - (crossAxisCount + 1) * 12) / crossAxisCount;
+    // Calculate aspect ratio based on card width
+    final aspectRatio = cardWidth / (cardWidth * 1.1); // Slightly shorter height for 2 columns
 
-      // Assert
-      expect(result, Right(authResponse));
-      verify(mockAuthRepository.register(
-        email: testEmail,
-        password: testPassword,
-        name: testName,
-      )).called(1);
-    });
-
-    test('logout should return void on success', () async {
-      // Arrange
-      when(mockAuthRepository.logout())
-          .thenAnswer((_) async => const Right(null));
-
-      // Act
-      final result = await mockAuthRepository.logout();
-
-      // Assert
-      expect(result, const Right(null));
-      verify(mockAuthRepository.logout()).called(1);
-    });
-
-    test('getCurrentUser should return User on success', () async {
-      // Arrange
-      final user = User(
-        id: 1,
-        email: testEmail,
-        name: testName,
-        role: 'user',
-      );
-      when(mockAuthRepository.getCurrentUser())
-          .thenAnswer((_) async => Right(user));
-
-      // Act
-      final result = await mockAuthRepository.getCurrentUser();
-
-      // Assert
-      expect(result, Right(user));
-      verify(mockAuthRepository.getCurrentUser()).called(1);
-    });
-
-    test('isAuthenticated should return true when user is authenticated', () async {
-      // Arrange
-      when(mockAuthRepository.isAuthenticated())
-          .thenAnswer((_) async => const Right(true));
-
-      // Act
-      final result = await mockAuthRepository.isAuthenticated();
-
-      // Assert
-      expect(result, const Right(true));
-      verify(mockAuthRepository.isAuthenticated()).called(1);
-    });
-  });
-
-  group('Idea Model Tests', () {
-    test('Idea model should correctly parse from JSON', () {
-      // Arrange
-      final json = {
-        'id': '1',
-        'title': 'Test Idea',
-        'description': 'Test Description',
-        'tags': ['test', 'idea'],
-        'status': 'pending',
-        'createdAt': '2024-03-20T10:00:00Z',
-        'updatedAt': '2024-03-20T10:00:00Z',
-        'userId': 'user1'
-      };
-
-      // Act
-      final idea = Idea.fromJson(json);
-
-      // Assert
-      expect(idea.id, equals('1'));
-      expect(idea.title, equals('Test Idea'));
-      expect(idea.description, equals('Test Description'));
-      expect(idea.tags, equals(['test', 'idea']));
-      expect(idea.status, equals('pending'));
-      expect(idea.userId, equals('user1'));
-    });
-
-    test('Idea model should correctly convert to JSON', () {
-      // Arrange
-      final idea = Idea(
-        id: '1',
-        title: 'Test Idea',
-        description: 'Test Description',
-        tags: ['test', 'idea'],
-        status: 'pending',
-        createdAt: DateTime.parse('2024-03-20T10:00:00Z'),
-        updatedAt: DateTime.parse('2024-03-20T10:00:00Z'),
-        userId: 'user1'
-      );
-
-      // Act
-      final json = idea.toJson();
-
-      // Assert
-      expect(json['id'], equals('1'));
-      expect(json['title'], equals('Test Idea'));
-      expect(json['description'], equals('Test Description'));
-      expect(json['tags'], equals(['test', 'idea']));
-      expect(json['status'], equals('pending'));
-      expect(json['userId'], equals('user1'));
-    });
-  });
-
-  group('Feedback Model Tests', () {
-    test('Feedback model should correctly parse from JSON', () {
-      // Arrange
-      final json = {
-        'id': '1',
-        'ideaId': 'idea1',
-        'content': 'Test Feedback',
-        'rating': 4,
-        'status': 'approved',
-        'createdAt': '2024-03-20T10:00:00Z',
-        'updatedAt': '2024-03-20T10:00:00Z',
-        'userId': 'user1'
-      };
-
-      // Act
-      final feedback = Feedback.fromJson(json);
-
-      // Assert
-      expect(feedback.id, equals('1'));
-      expect(feedback.ideaId, equals('idea1'));
-      expect(feedback.content, equals('Test Feedback'));
-      expect(feedback.rating, equals(4));
-      expect(feedback.status, equals('approved'));
-      expect(feedback.userId, equals('user1'));
-    });
-
-    test('Feedback model should correctly convert to JSON', () {
-      // Arrange
-      final feedback = Feedback(
-        id: '1',
-        ideaId: 'idea1',
-        content: 'Test Feedback',
-        rating: 4,
-        status: 'approved',
-        createdAt: DateTime.parse('2024-03-20T10:00:00Z'),
-        updatedAt: DateTime.parse('2024-03-20T10:00:00Z'),
-        userId: 'user1'
-      );
-
-      // Act
-      final json = feedback.toJson();
-
-      // Assert
-      expect(json['id'], equals('1'));
-      expect(json['ideaId'], equals('idea1'));
-      expect(json['content'], equals('Test Feedback'));
-      expect(json['rating'], equals(4));
-      expect(json['status'], equals('approved'));
-      expect(json['userId'], equals('user1'));
-    });
-  });
-} 
+    return GridView.builder(
+    padding: const EdgeInsets.all(12),
+    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+    crossAxisCount: crossAxisCount,
+    childAspectRatio: aspectRatio,
+    crossAxisSpacing: 12,
+    mainAxisSpacing: 12,
+    ),
+    itemCount: _ideas.length,
+    itemBuilder: (context, index) {
+    final idea = _ideas[index];
+    final feedback = (idea['feedback'] as List?)?.last;
+    return Card(
+    elevation: 1,shadowColor: const Color(0xFFFFA500).withOpacity(0.1),
+    color: const Color(0xFF2A2A2A),
+    shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(6),
+    side: BorderSide(
+    color: const Color(0xFFFFA500).withOpacity(0.2),
+    width: 1,
+    ),
+    ),
+    child: InkWell(
+    onTap: () {
+    // TODO: Navigate to idea details
+    },
+    borderRadius: BorderRadius.circular(6),
+    child: Container(
+    decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(6),
+    color: const Color(0xFF2A2A2A),
+    ),
+    child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+    // Status and Like button row
+    Padding(
+    padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
+    child: Row(
+    children: [
+    Container(
+    padding: const EdgeInsets.symmetric(
+    horizontal: 6,
+    vertical: 2,
+    ),
+    decoration: BoxDecoration(
+    color: const Color(0xFFFFA500).withOpacity(0.15),
+    borderRadius: BorderRadius.circular(4),
+    ),
+    child: const Text(
+    'Approved',
+    style: TextStyle(
+    color: Color(0xFFFFA500),
+    fontSize: 10,
+    fontWeight: FontWeight.w600,
+    ),
+    ),
+    ),
+    const Spacer(),
+    IconButton(
+    icon: const Icon(
+    Icons.favorite_border,
+    color: Color(0xFFFFA500),
+    size: 16,
+    ),
+    onPressed: () {
+    // TODO: Implement like functionality
+    },
+    padding: EdgeInsets.zero,
+    constraints: const BoxConstraints(),
+    ),
+    ],
+    ),
+    ),
+    // Title
+    Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 8),
+    child: Text(idea['title'] ?? 'Untitled',
+    style: const TextStyle(
+    color: Colors.white,
+    fontSize: 13,
+    fontWeight: FontWeight.bold,
+    height: 1.2,
+    ),
+    maxLines: 2,
+    overflow: TextOverflow.ellipsis,
+    ),
+    ),
+    const SizedBox(height: 4),
+    // Description
+    Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 8),
+    child: Text(
+    idea['description'] ?? 'No description',
+    style: TextStyle(
+    color: Colors.grey[400],
+    fontSize: 11,
+    height: 1.2,
+    ),
+    maxLines: 2,
+    overflow: TextOverflow.ellipsis,
+    ),
+    ),
+    const Spacer(),
+    // Feedback section
+    if (feedback != null)
+    Container(
+    margin: const EdgeInsets.fromLTRB(8, 0, 8, 6),
+    padding: const EdgeInsets.all(6),
+    decoration: BoxDecoration(
+    color: Colors.black.withOpacity(0.2),
+    borderRadius: BorderRadius.circular(4),
+    ),
+    child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+    const Text(
+    'Latest Feedback',
+    style: TextStyle(
+    color: Color(0xFFFFA500),
+    fontSize: 10,
+    fontWeight: FontWeight.w600,
+    ),
+    ),
+    const SizedBox(height: 2),
+    Text(
+    feedback['comment'] ?? '',
+    style: TextStyle(
+    color: Colors.grey[300],
+    fontSize: 10,
+    height: 1.1,
+    ),
+    maxLines: 1,
+    overflow: TextOverflow.ellipsis,
+    ),
+    ],
+    ),
+    ),
+    // User info and timestamp
+    Padding(
+    padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Row(
+            children: [
+              Icon(
+                Icons.person_outline,
+                size: 10,
+                color: Colors.grey[400],
+              ),
+              const SizedBox(width: 2),
+              Expanded(
+                child: Text(
+                  idea['user']?['email'] ?? 'Unknown',
+                  style: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 10,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 4),
+        Row(
+          children: [
+            Icon(
+              Icons.access_time,
+              size: 10,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(width: 2),
+            Text(
+              DateTime.parse(idea['createdAt'])
+                  .toLocal()
+                  .toString()
+                  .split('.')[0],
+              style: TextStyle(
+                color: Colors.grey[400],
+                fontSize: 10,
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+    ),
+    ],
+    ),
+    ),
+    ),
+    );
+    },
+    );
+            },
+            ),
+        ),
+    );
+  }Widget _buildDrawerItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1A1A),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: const Color(0xFFFFA500),
+              size: 24,
+            ),
+            const SizedBox(width: 16),
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
