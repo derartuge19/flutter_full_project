@@ -27,7 +27,7 @@ import { profile } from 'console';
       autoLoadEntities: true,
     }),
 
-    TypeOrmModule.forFeature([User, Feedback, Idea, Profile]), // Import the entities here
+    TypeOrmModule.forFeature([User, Feedback, Idea, Profile]), 
 
     AuthModule,
     UsersModule,
