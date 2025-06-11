@@ -9,7 +9,7 @@ class LandingPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // Background image (or fallback if asset not found)
+        
           Positioned.fill(
             child: Builder(
               builder: (context) {
@@ -22,13 +22,13 @@ class LandingPage extends StatelessWidget {
                     },
                   );
                 } catch (e) {
-                   // Fallback (or placeholder) if asset not found
+
                    return Container(color: const Color(0xFF1A1A1A));
                 }
               },
             ),
           ),
-          // Overlay content
+
           Positioned.fill(
             child: SafeArea(
               child: Column(
