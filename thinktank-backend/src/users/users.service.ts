@@ -38,8 +38,8 @@ export class UsersService {
   // Adjusted findByEmail method to directly query User's email
   async findByEmail(email: string): Promise<User | undefined> {
     return this.userRepo.findOne({
-      where: { email }, // Directly query email from the User entity
-      relations: ['profile'], // Still load the profile for related data
+      where: { email }, 
+      relations: ['profile'], 
     });
   }
 
