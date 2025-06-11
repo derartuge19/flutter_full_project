@@ -46,11 +46,7 @@ export class IdeasController {
     return this.ideasService.getAllIdeas();
   }
 
-  // Get all public (approved) ideas
-  // @Get('/public')
-  // async getPublicIdeas() {
-  //   return this.ideasService.getApprovedIdeas();
-  // }
+  
   @Get('/public')
   async getPublicIdeas() {
     return this.ideasService.getIdeasWithApprovedFeedback();
@@ -61,7 +57,6 @@ export class IdeasController {
     return this.ideasService.getIdeaById(id);
   }
 
-  // Approve Idea - Only 'admin' role allowed
   @Patch(':id/approve')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
