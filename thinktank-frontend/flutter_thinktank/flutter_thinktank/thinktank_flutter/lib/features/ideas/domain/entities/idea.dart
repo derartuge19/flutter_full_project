@@ -1,22 +1,41 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
+import { ProfileService } from './profile.service';
+import { CreateProfileDto } from './dtos/create-profile.dto';
+import { UpdateProfileDto } from './dtos/update-profile.dto';
 
-part 'idea.freezed.dart';
-part 'idea.g.dart';
+@Controller('profiles')
+export class ProfileController {
+  constructor(private readonly profileService: ProfileService) {}
 
-@freezed
-class Idea with _$Idea {
-  const factory Idea({
-    required int id,
-    required String title,
-    required String description,
-    required String status,
-    required int userId,
-    required String userName,
-    String? feedback,
-    int? rating,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-  }) = _idea;
+  @Post()
+  async create(@Body() createProfileDto: CreateProfileDto) {
+    return this.profileService.create(createProfileDto);
+  }
 
-  factory Idea.fromJson(Map<String, dynamic> json) => _$IdeaFromJson(json);
-} 
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.profileService.findOne(id);
+  }
+
+  @Patch(':id')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    return this.profileService.update(id, updateProfileDto);
+  }
+
+  @Delete(':id')
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return this.profileService.remove(id);
+  }
+}
