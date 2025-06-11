@@ -5,7 +5,7 @@ import {
   IsEnum,
   IsNotEmpty,
 } from 'class-validator';
-import { FeedbackStatus } from '../entities/feedback.entity'; // Assuming you have this enum
+import { FeedbackStatus } from '../entities/feedback.entity';
 
 export class CreateFeedbackDto {
   @IsNotEmpty()

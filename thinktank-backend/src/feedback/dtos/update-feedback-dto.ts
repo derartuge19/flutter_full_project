@@ -10,10 +10,5 @@ export class UpdateFeedbackDto {
   @IsEnum(FeedbackStatus)
   status?: FeedbackStatus;
 
-  // You might choose whether or not to allow updating ideaId
-  // @IsOptional()
-  // @IsInt()
-  // ideaId?: number;
-
-  // Updating the admin association is generally not recommended
+ 
 }
