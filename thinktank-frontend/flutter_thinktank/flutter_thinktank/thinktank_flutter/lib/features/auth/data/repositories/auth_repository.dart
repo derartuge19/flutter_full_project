@@ -8,12 +8,11 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:flutter/material.dart';
 
 class AuthRepository {
-  // Use different URLs based on platform
   static String get _baseUrl {
     if (kIsWeb) {
-      return 'http://localhost:3444'; // For web (Chrome)
+      return 'http://localhost:3444'; 
     } else {
-      return 'http://10.0.2.2:3444'; // For Android emulator
+      return 'http://10.0.2.2:3444'; 
     }
   }
 
