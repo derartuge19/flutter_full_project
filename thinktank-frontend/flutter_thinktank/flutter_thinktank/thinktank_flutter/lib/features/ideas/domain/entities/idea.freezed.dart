@@ -51,18 +51,17 @@ abstract class $IdeaCopyWith<$Res> {
       DateTime? updatedAt});
 }
 
-/// @nodoc
+
 class _$IdeaCopyWithImpl<$Res, $Val extends Idea>
     implements $IdeaCopyWith<$Res> {
   _$IdeaCopyWithImpl(this._value, this._then);
 
-  // ignore: unused_field
+  
   final $Val _value;
-  // ignore: unused_field
+ 
   final $Res Function($Val) _then;
 
-  /// Create a copy of Idea
-  /// with the given fields replaced by the non-null parameter values.
+  
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -179,31 +178,31 @@ class __$$IdeaImplCopyWithImpl<$Res>
               as String,
       status: null == status
           ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
+          : status
               as String,
       userId: null == userId
           ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
+          : userId 
               as int,
       userName: null == userName
           ? _value.userName
-          : userName // ignore: cast_nullable_to_non_nullable
+          : userName 
               as String,
       feedback: freezed == feedback
           ? _value.feedback
-          : feedback // ignore: cast_nullable_to_non_nullable
+          : feedback 
               as String?,
       rating: freezed == rating
           ? _value.rating
-          : rating // ignore: cast_nullable_to_non_nullable
+          : rating 
               as int?,
       createdAt: freezed == createdAt
           ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
+          : createdAt 
               as DateTime?,
       updatedAt: freezed == updatedAt
           ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
+          : updatedAt 
               as DateTime?,
     ));
   }
@@ -280,8 +279,7 @@ class _$IdeaImpl implements _Idea {
   int get hashCode => Object.hash(runtimeType, id, title, description, status,
       userId, userName, feedback, rating, createdAt, updatedAt);
 
-  /// Create a copy of Idea
-  /// with the given fields replaced by the non-null parameter values.
+  
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -332,8 +330,7 @@ abstract class _Idea implements Idea {
   @override
   DateTime? get updatedAt;
 
-  /// Create a copy of Idea
-  /// with the given fields replaced by the non-null parameter values.
+  
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$IdeaImplCopyWith<_$IdeaImpl> get copyWith =>
