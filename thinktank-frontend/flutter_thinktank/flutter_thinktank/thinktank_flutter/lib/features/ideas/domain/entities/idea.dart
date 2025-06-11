@@ -16,7 +16,7 @@ class Idea with _$Idea {
     int? rating,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) = _Idea;
+  }) = _idea;
 
   factory Idea.fromJson(Map<String, dynamic> json) => _$IdeaFromJson(json);
 } 
