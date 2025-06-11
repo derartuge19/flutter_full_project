@@ -43,9 +43,6 @@ class _FakeEither_2<L, R> extends _i1.SmartFake implements _i3.Either<L, R> {
         );
 }
 
-/// A class which mocks [AuthRemoteDataSource].
-///
-/// See the documentation for Mockito's code generation for more information.
 class MockAuthRemoteDataSource extends _i1.Mock
     implements _i4.AuthRemoteDataSource {
   MockAuthRemoteDataSource() {
@@ -170,10 +167,6 @@ class MockAuthRemoteDataSource extends _i1.Mock
         returnValueForMissingStub: _i5.Future<void>.value(),
       ) as _i5.Future<void>);
 }
-
-/// A class which mocks [SharedPreferences].
-///
-/// See the documentation for Mockito's code generation for more information.
 class MockSharedPreferences extends _i1.Mock implements _i6.SharedPreferences {
   MockSharedPreferences() {
     _i1.throwOnMissingStub(this);
