@@ -8,7 +8,7 @@ class FeedbackPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // TODO: Load feedback for the given ideaId
+    
     final feedback = 'This is a sample feedback for your idea.';
     final status = 'approved';
 
