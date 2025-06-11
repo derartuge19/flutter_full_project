@@ -44,14 +44,13 @@ void main() {
       await tester.tap(find.text('Submit Idea'));
       await tester.pumpAndSettle();
 
-      // Fill idea submission form
       await tester.enterText(find.byType(TextFormField).at(0), 'Test Idea');
       await tester.enterText(find.byType(TextFormField).at(1), 'This is a test idea description');
       await tester.enterText(find.byType(TextFormField).at(2), 'test, idea');
       await tester.tap(find.byType(ElevatedButton));
       await tester.pumpAndSettle();
 
-      // Verify navigation to my ideas page
+     
       expect(find.text('My Ideas'), findsOneWidget);
 
       await tester.tap(find.byIcon(Icons.menu));
@@ -63,7 +62,7 @@ void main() {
       expect(find.text('John Doe'), findsOneWidget);
       expect(find.text('test@example.com'), findsOneWidget);
 
-      // Test logout
+   
       await tester.tap(find.byIcon(Icons.menu));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Logout'));
@@ -76,7 +75,7 @@ void main() {
       await tester.tap(find.text('Login'));
       await tester.pumpAndSettle();
 
-      // Fill login form
+    
       await tester.enterText(find.byType(TextFormField).at(0), 'test@example.com');
       await tester.enterText(find.byType(TextFormField).at(1), 'password123');
       await tester.tap(find.byType(ElevatedButton));
@@ -86,24 +85,23 @@ void main() {
     });
 
     testWidgets('Admin journey test', (tester) async {
-      // Start the app
+    
       app.main();
       await tester.pumpAndSettle();
 
-      // Login as admin
       await tester.tap(find.text('Login'));
       await tester.pumpAndSettle();
 
-      // Fill login form with admin credentials
+      
       await tester.enterText(find.byType(TextFormField).at(0), 'admin@example.com');
       await tester.enterText(find.byType(TextFormField).at(1), 'admin123');
       await tester.tap(find.byType(ElevatedButton));
       await tester.pumpAndSettle();
 
-      // Verify navigation to dashboard
+
       expect(find.text('Dashboard'), findsOneWidget);
 
-      // Test feedback pool access
+   
       await tester.tap(find.byIcon(Icons.menu));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Feedback Pool'));
@@ -113,7 +111,7 @@ void main() {
       expect(find.text('Feedback Pool'), findsOneWidget);
       expect(find.byIcon(Icons.rate_review), findsOneWidget);
 
-      // Test reviewed ideas access
+      
       await tester.tap(find.byIcon(Icons.rate_review));
       await tester.pumpAndSettle();
 
