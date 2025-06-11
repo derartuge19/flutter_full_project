@@ -49,13 +49,7 @@ export class IdeasService {
     });
   }
 
-  // async getApprovedIdeas(): Promise<Idea[]> {
-  //   return this.ideaRepo.find({
-  //     where: { status: IdeaStatus.Approved },
-  //     relations: ['user'],
-  //     order: { createdAt: 'DESC' },
-  //   });
-  // }
+  
 
   async getIdeasWithApprovedFeedback(): Promise<Idea[]> {
     return this.ideaRepo
@@ -100,7 +94,7 @@ export class IdeasService {
 
     await this.ideaRepo.remove(idea);
   }
-  // backend/src/ideas/ideas.service.ts
+  
   async updateIdea(
     id: number,
     userId: number,
@@ -115,12 +109,10 @@ export class IdeasService {
       throw new NotFoundException('Idea not found');
     }
 
-    // Check if user is the owner of the idea
     if (idea.user.id !== userId) {
       throw new ForbiddenException('You can only update your own ideas');
     }
 
-    // Update the idea fields
     idea.title = updateIdeaDto.title;
     idea.description = updateIdeaDto.description;
 
