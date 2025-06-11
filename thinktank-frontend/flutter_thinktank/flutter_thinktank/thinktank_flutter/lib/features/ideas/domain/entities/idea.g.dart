@@ -35,4 +35,4 @@ Map<String, dynamic> _$$IdeaImplToJson(_$IdeaImpl instance) =>
       'rating': instance.rating,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
-    };
+};
