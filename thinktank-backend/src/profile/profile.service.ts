@@ -29,7 +29,7 @@ export class ProfileService {
     id: number,
     updateProfileDto: UpdateProfileDto,
   ): Promise<Profile> {
-    await this.findOne(id); // Ensure profile exists
+    await this.findOne(id);
     await this.profileRepository.update(id, updateProfileDto);
     return await this.findOne(id);
   }
