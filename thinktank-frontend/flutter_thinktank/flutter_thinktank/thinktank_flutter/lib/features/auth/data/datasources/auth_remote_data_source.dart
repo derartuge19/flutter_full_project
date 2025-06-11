@@ -160,4 +160,4 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw ServerException('Failed to change password');
     }
   }
-} 
+}
