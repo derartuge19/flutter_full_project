@@ -174,7 +174,7 @@ class __$$IdeaImplCopyWithImpl<$Res>
               as String,
       description: null == description
           ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
+          : description 
               as String,
       status: null == status
           ? _value.status
@@ -208,7 +208,7 @@ class __$$IdeaImplCopyWithImpl<$Res>
   }
 }
 
-/// @nodoc
+
 @JsonSerializable()
 class _$IdeaImpl implements _Idea {
   const _$IdeaImpl(
