@@ -44,4 +44,4 @@ class Idea {
       'userId': userId,
     };
   }
-} 
+}
