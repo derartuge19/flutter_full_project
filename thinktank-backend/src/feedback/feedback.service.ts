@@ -26,7 +26,7 @@ export class FeedbackService {
       ...createFeedbackDto,
       admin: { id: adminId },
       idea: { id: createFeedbackDto.ideaId },
-      status: createFeedbackDto.status, // Use the status directly from the DTO
+      status: createFeedbackDto.status, 
     });
 
     return this.feedbackRepo.save(feedback);
@@ -82,8 +82,8 @@ export class FeedbackService {
   }
   async getApprovedFeedback(): Promise<Feedback[]> {
     return this.feedbackRepo.find({
-      where: { status: FeedbackStatus.Approved }, // Fetch only feedback with 'Approved' status
-      relations: ['admin', 'idea'], // Include related admin and idea data
+      where: { status: FeedbackStatus.Approved },
+      relations: ['admin', 'idea'], 
       withDeleted: false,
     });
   }
