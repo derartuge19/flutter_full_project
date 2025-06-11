@@ -54,7 +54,7 @@ class _SubmitIdeaPageState extends State<SubmitIdeaPage> {
   Future<void> _submitIdea() async {
     if (!_formKey.currentState!.validate()) return;
 
-    // Check admin role again before submission
+    
     final isAdmin = await _authRepo.isAdmin();
     if (isAdmin) {
       setState(() {
@@ -174,7 +174,7 @@ class _SubmitIdeaPageState extends State<SubmitIdeaPage> {
             if (context.canPop()) {
               context.pop();
             } else {
-              context.go('/my-ideas'); // Navigate to my ideas page if no route to pop
+              context.go('/my-ideas'); 
             }
           },
         ),
