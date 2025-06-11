@@ -55,12 +55,10 @@ class AppRouter {
     redirect: (context, state) async {
       final loc = state.matchedLocation;
       
-      // Allow access to public routes
       if (publicRoutes.contains(loc)) {
         return null;
       }
       
-      // Check authentication for protected routes
       if (protectedRoutes.any((route) => loc.startsWith(route.split(":")[0]))) {
         final token = await _authRepository.getToken();
         if (token == null) {
@@ -108,7 +106,7 @@ class AppRouter {
     ],
   );
 
-  // Admin role check middleware
+ 
   Future<String?> _adminGuard(BuildContext context, GoRouterState state) async {
     final token = await _authRepository.getToken();
     if (token == null) {
