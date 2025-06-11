@@ -5,7 +5,7 @@ import 'package:thinktank_flutter/core/error/exceptions.dart';
 import 'package:thinktank_flutter/features/auth/data/repositories/auth_repository.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:io'; // Import for SocketException
+import 'dart:io'; 
 
 class ApiClient {
   final Dio dio;
@@ -51,9 +51,7 @@ class ApiClient {
         if (e.response?.statusCode == 401) {
           // Unauthorized - token might be expired or invalid
           print('401 Unauthorized - Attempting to refresh token or redirect to login.');
-          await _authRepo.logout(); // Clear invalid token
-          // You might want to navigate to login page here
-          // Note: Cannot use context here. The navigation should be handled at the UI layer.
+          await _authRepo.logout(); 
         } else if (e.response?.statusCode == 403) {
           print('403 Forbidden - User does not have access.');
         } else if (e.type == DioExceptionType.connectionTimeout) {
