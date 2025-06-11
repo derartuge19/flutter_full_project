@@ -183,7 +183,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 backgroundColor: Colors.green,
               ),
             );
-            context.pop(); // Go back to profile page
+            context.pop(); 
           }
         } else {
           throw Exception(response.data?['message'] ?? 'Failed to update profile');
@@ -425,4 +425,4 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
     );
   }
-} 
+}
