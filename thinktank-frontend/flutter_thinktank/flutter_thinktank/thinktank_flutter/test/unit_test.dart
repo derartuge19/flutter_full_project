@@ -13,14 +13,12 @@ import 'package:thinktank_flutter/features/feedback/data/models/feedback.dart';
 import 'package:dartz/dartz.dart';
 import 'package:thinktank_flutter/features/auth/domain/entities/user.dart';
 
-// Generate mock classes
 @GenerateMocks([AuthRemoteDataSource, SharedPreferences, AuthRepository])
 import 'unit_test.mocks.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  // Mock SharedPreferences for testing
   SharedPreferences.setMockInitialValues({});
 
   late MockAuthRemoteDataSource mockRemoteDataSource;
@@ -29,15 +27,12 @@ void main() {
   late MockAuthRepository mockAuthRepository;
 
   setUp(() async {
-    // Clear SharedPreferences before each test
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
     
-    // Create mock instances
     mockRemoteDataSource = MockAuthRemoteDataSource();
     mockPrefs = MockSharedPreferences();
     
-    // Create test repository with mocks
     authRepository = AuthRepositoryImpl(mockRemoteDataSource);
     mockAuthRepository = MockAuthRepository();
   });
