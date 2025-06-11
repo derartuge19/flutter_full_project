@@ -1,10 +1,5 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'feedback.dart';
-
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
 
 _$FeedbackImpl _$$FeedbackImplFromJson(Map<String, dynamic> json) =>
     _$FeedbackImpl(
