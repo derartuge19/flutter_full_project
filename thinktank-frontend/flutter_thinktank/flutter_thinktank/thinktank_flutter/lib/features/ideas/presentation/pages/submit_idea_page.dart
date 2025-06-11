@@ -19,7 +19,7 @@ class _SubmitIdeaPageState extends State<SubmitIdeaPage> {
   String? _error;
   late AuthRepository _authRepo;
 
-  // Use the correct port for your backend
+  
   static const String baseUrl = 'http://10.0.2.2:3444';
 
   @override
@@ -43,7 +43,7 @@ class _SubmitIdeaPageState extends State<SubmitIdeaPage> {
               backgroundColor: Colors.red,
             ),
           );
-          context.go('/dashboard'); // Redirect to dashboard
+          context.go('/dashboard'); 
         }
       }
     } catch (e) {
@@ -84,7 +84,7 @@ class _SubmitIdeaPageState extends State<SubmitIdeaPage> {
       print('Submitting idea to: ${baseUrl}/ideas');
       print('With token: Bearer $token');
 
-      // Format tags as a comma-separated string
+
       final tagsString = _tagsController.text.trim();
       
       final response = await dio.post(
@@ -92,7 +92,7 @@ class _SubmitIdeaPageState extends State<SubmitIdeaPage> {
         data: {
           'title': _titleController.text,
           'description': _descriptionController.text,
-          'tags': tagsString, // Send as string instead of array
+          'tags': tagsString, 
         },
       );
 
@@ -128,7 +128,7 @@ class _SubmitIdeaPageState extends State<SubmitIdeaPage> {
         } else if (e.response?.statusCode == 404) {
           _error = 'The ideas endpoint was not found. Please check if the backend server is running correctly.';
         } else if (e.response?.statusCode == 400) {
-          // Handle validation errors
+         
           final message = e.response?.data?['message'];
           if (message is List) {
             _error = message.join('\n');
