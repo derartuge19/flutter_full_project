@@ -94,11 +94,9 @@ class _EditFeedbackPageState extends State<EditFeedbackPage> {
           return;
         }
 
-        // Convert comment to string if it's not already
         final comment = feedback['comment']?.toString() ?? '';
         _commentController.text = comment;
 
-        // Convert string status to enum
         switch (feedback['status']?.toString().toLowerCase()) {
           case 'approved':
             _status = FeedbackStatus.approved;
@@ -170,7 +168,6 @@ class _EditFeedbackPageState extends State<EditFeedbackPage> {
         return;
       }
 
-      // Convert enum to proper status string
       String statusString;
       switch (_status) {
         case FeedbackStatus.reviewed:
@@ -258,7 +255,7 @@ class _EditFeedbackPageState extends State<EditFeedbackPage> {
             if (context.canPop()) {
               context.pop();
             } else {
-              context.go('/reviewed-ideas'); // Navigate to a logical previous page if no route to pop
+              context.go('/reviewed-ideas');
             }
           },
         ),
