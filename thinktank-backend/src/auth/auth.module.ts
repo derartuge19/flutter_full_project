@@ -9,15 +9,15 @@ import { UsersModule } from '../users/users.module';
 import { JwtStrategy } from './jwt.startegy';
 // import * as dotenv from 'dotenv';
 
-// dotenv.config(); // Load environment variables
+
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
     JwtModule.register({
-      secret: 'mystrongsecretkey', // ✅ Use secret from .env
-      signOptions: { expiresIn: '1h' }, // Token expiry time
+      secret: 'mystrongsecretkey', 
+      signOptions: { expiresIn: '1h' }, 
     }),
   ],
   providers: [AuthService, JwtStrategy],
