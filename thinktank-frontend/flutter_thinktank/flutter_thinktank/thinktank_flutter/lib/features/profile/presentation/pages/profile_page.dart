@@ -52,9 +52,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
       print('Loading profile for user ID: $userId');
 
-      // Get current user info
+      
       final dio = Dio();
-      // Ensure token is properly formatted with 'Bearer ' prefix
+      
       final authToken = token.startsWith('Bearer ') ? token : 'Bearer $token';
       dio.options.headers['Authorization'] = authToken;
       print('Using Authorization header: $authToken');
