@@ -36,13 +36,13 @@ class _IdeaSubmissionPageState extends State<IdeaSubmissionPage> {
     setState(() {
       _isSubmitting = true;
     });
-    // TODO: Implement actual submission logic
+   
     await Future.delayed(const Duration(seconds: 1));
     setState(() {
       _isSubmitting = false;
     });
     if (mounted) {
-      Navigator.pop(context); // Go back after submission
+      Navigator.pop(context);
     }
   }
 
@@ -66,9 +66,9 @@ class _IdeaSubmissionPageState extends State<IdeaSubmissionPage> {
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
                       onPressed: () {
                         if (context.canPop()) {
-                          Navigator.pop(context); // Use Navigator.pop for consistency with existing code
+                          Navigator.pop(context); 
                         } else {
-                          // If this page is reached directly, navigate to a logical previous page
+                          
                           context.go('/my-ideas'); 
                         }
                       },
